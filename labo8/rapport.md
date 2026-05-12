@@ -1,0 +1,280 @@
+# SCF, Laboratoire n°8 : Filtre FIR
+
+# 1. Introduction
+
+> Note : J'ai un problème avec le VPN de l'école qui ne veut pas se connecter, je n'ai donc pas accès au licence...
+
+## 1.1 Objectif du laboratoire
+
+Le but de ce laboratoire est de concevoir et implémenter un filtre FIR (Finite Impulse Response) selon trois architectures différentes :
+
+- Architecture combinatoire
+- Architecture séquentielle
+- Architecture pipelinée
+
+Le laboratoire permet d’étudier les compromis entre :
+- ressources matérielles utilisées,
+- fréquence maximale atteignable,
+- latence,
+- débit de traitement.
+
+
+## 1.2 Rappel théorique
+
+Un filtre FIR d’ordre `N` calcule sa sortie selon l’équation :
+
+:contentReference[oaicite:0]{index=0}
+
+avec :
+- `x[n]` : signal d’entrée,
+- `y[n]` : signal de sortie,
+- `b_i` : coefficients du filtre.
+
+Le filtre utilise un registre à décalage permettant de conserver les `N+1` dernières valeurs d’entrée.
+
+
+# 2. Cahier des charges
+
+## 2.1 Paramètres génériques
+
+| Paramètre | Description |
+|---|---|
+| `ORDER` | Ordre du filtre |
+| `DATASIZE` | Taille des données |
+| `COEFFSIZE` | Taille des coefficients |
+| `COMMAPOS` | Position de la virgule fixe |
+
+
+## 2.2 Interface du module
+
+```vhdl
+entity fir_filter is
+generic (
+    ORDER : positive := 8;
+    DATASIZE : positive := 16;
+    COEFFSIZE : positive := 16;
+    COMMAPOS : natural := 0
+);
+port (
+    clk_i : in std_logic;
+    rst_i : in std_logic;
+    din_valid_i : in std_logic;
+    din_i : in std_logic_vector(DATASIZE-1 downto 0);
+    din_ready_o : out std_logic;
+    coeffs_i : in coeff_array(0 to ORDER);
+    dout_valid_o : out std_logic;
+    dout_o : out std_logic_vector(DATASIZE-1 downto 0);
+    dout_ready_i : in std_logic
+);
+end entity fir_filter;
+```
+
+# 3. Architecture combinatoire
+
+## 3.1 Principe
+
+Décrire ici :
+
+* le fonctionnement général,
+* l’utilisation du registre à décalage,
+* le calcul parallèle des multiplications,
+* l’addition des produits.
+
+---
+
+## 3.2 Schéma de l’architecture
+
+> Insérer ici un schéma ou une photo du dessin.
+
+![Schéma combinatoire](images/combinatoire.png)
+
+## 3.3 Choix d’implémentation
+
+Décrire :
+
+* structure de l’arbre d’addition,
+* types numériques utilisés,
+* gestion du handshake,
+* gestion du débordement/troncature.
+
+
+## 3.4 Avantages et inconvénients
+
+### Avantages
+
+* Faible latence
+* Débit élevé
+
+### Inconvénients
+
+* Forte consommation de ressources
+* Chemin critique important
+
+
+# 4. Architecture séquentielle
+
+## 4.1 Principe
+
+Décrire :
+
+* utilisation d’un unique multiplicateur,
+* accumulation séquentielle,
+* machine d’état éventuelle,
+* nombre de cycles nécessaires.
+
+## 4.2 Schéma de l’architecture
+
+![Schéma séquentiel](images/sequentiel.png)
+
+
+## 4.3 Choix d’implémentation
+
+Décrire :
+
+* FSM utilisée,
+* registres internes,
+* compteur de taps,
+* gestion des signaux valid/ready.
+
+
+## 4.4 Avantages et inconvénients
+
+### Avantages
+
+* Très faible consommation de ressources
+* Peu de DSP utilisés
+
+### Inconvénients
+
+* Latence importante
+* Débit plus faible
+
+
+# 5. Architecture pipelinée
+
+## 5.1 Principe
+
+Décrire :
+
+* découpage en étages pipeline,
+* insertion de registres,
+* amélioration de la fréquence maximale.
+
+
+## 5.2 Schéma de l’architecture
+
+![Schéma pipeliné](images/pipeline.png)
+
+---
+
+## 5.3 Choix d’implémentation
+
+Décrire :
+
+* nombre d’étages pipeline,
+* équilibre des calculs,
+* gestion de la validité des données.
+
+
+## 5.4 Avantages et inconvénients
+
+### Avantages
+
+* Fréquence maximale élevée
+* Bon débit
+
+### Inconvénients
+
+* Plus de registres
+* Latence augmentée
+
+
+# 6. Vérification et simulations
+
+## 6.1 Banc de test
+
+Décrire :
+
+* fonctionnement du testbench,
+* stimuli utilisés,
+* vérification des résultats.
+
+## 6.2 Résultats de simulation
+
+### Architecture combinatoire
+
+> Insérer captures d’écran et commentaires.
+
+![Simulation combinatoire](images/sim_comb.png)
+
+
+### Architecture séquentielle
+
+![Simulation séquentielle](images/sim_seq.png)
+
+
+### Architecture pipelinée
+
+![Simulation pipeline](images/sim_pipe.png)
+
+
+# 7. Résultats de synthèse
+
+## 7.1 Cible utilisée
+
+* Carte : DE1-SoC
+* FPGA : (à compléter)
+* Outil : Quartus Prime (version)
+
+
+## 7.2 Tableau récapitulatif
+
+| Architecture | ALUTs / Logic | Registres | DSP | Fmax | Latence |
+| ------------ | ------------- | --------- | --- | ---- | ------- |
+| Combinatoire |               |           |     |      |         |
+| Séquentielle |               |           |     |      |         |
+| Pipelinée    |               |           |     |      |         |
+
+
+## 7.3 Analyse des résultats
+
+Décrire :
+
+* impact du pipeline sur Fmax,
+* coût matériel,
+* compromis ressources/performance,
+* intérêt de chaque architecture selon le contexte.
+
+
+# 8. Difficultés rencontrées
+
+Décrire :
+
+* problèmes de timing,
+* gestion des tailles de mots,
+* synchronisation,
+* bugs rencontrés,
+* solutions apportées.
+
+
+# 9. Utilisation de l’intelligence artificielle
+
+Décrire précisément :
+
+* aide à la compréhension,
+* génération de code,
+* aide au debug,
+* rédaction du rapport,
+* explications théoriques.
+
+
+L'IA a été utilisé afin de réaliser le template vide du rapport selon les demandes et chapitres de la consigne. J'ai ensuite modifié le résultat afin de retirer les chapitres inutiles (par exemple un chapitre `Signaux Entrée/Sortie`) afin de minimser le rapport et éviter d'écrire un roman.
+
+# 10. Conclusion
+
+Résumer :
+
+* les résultats obtenus,
+* les différences entre architectures,
+* les enseignements tirés du laboratoire.
+
