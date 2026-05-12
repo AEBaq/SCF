@@ -71,24 +71,12 @@ end entity fir_filter;
 
 # 3. Architecture combinatoire
 
-## 3.1 Principe
 
-Décrire ici :
-
-* le fonctionnement général,
-* l’utilisation du registre à décalage,
-* le calcul parallèle des multiplications,
-* l’addition des produits.
-
----
-
-## 3.2 Schéma de l’architecture
-
-> Insérer ici un schéma ou une photo du dessin.
+## 3.1 Schéma de l’architecture
 
 ![Schéma combinatoire](images/combinatoire.png)
 
-## 3.3 Choix d’implémentation
+## 3.2 Choix d’implémentation
 
 Décrire :
 
@@ -97,6 +85,11 @@ Décrire :
 * gestion du handshake,
 * gestion du débordement/troncature.
 
+J'ai mis en place un type `data_array_t` afin de pouvoir mettre en place un registre de décalage par la suite. 
+
+J'ai 2 process dans mon architecture. Le premier `shift_process` s'occupe d'effectuer le décalage de mon registre pour les `x` utiilsés pour le filtre. Le deuxième est le process `fir_process` utilisé pour l'application combinatoire du filtre fir. Dans notre cas combinatoire, nous avons techniquement directement un output dès notre input. Ainsi, nos signaux de contrôle sont "prêts" directement.
+
+Comme nous avons une gestion de la virgule à effectuer avec `COMMAPOS`, j'ai modifié en conséquence le résultat calculé avant de l'assigner à `dout_o`.
 
 ## 3.4 Avantages et inconvénients
 
