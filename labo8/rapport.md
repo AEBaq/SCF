@@ -87,80 +87,35 @@ Décrire :
 
 J'ai mis en place un type `data_array_t` afin de pouvoir mettre en place un registre de décalage par la suite. 
 
-J'ai 2 process dans mon architecture. Le premier `shift_process` s'occupe d'effectuer le décalage de mon registre pour les `x` utiilsés pour le filtre. Le deuxième est le process `fir_process` utilisé pour l'application combinatoire du filtre fir. Dans notre cas combinatoire, nous avons techniquement directement un output dès notre input. Ainsi, nos signaux de contrôle sont "prêts" directement.
+J'ai 2 process dans mon architecture. Le premier `shift_process` s'occupe d'effectuer le décalage de mon registre pour les `x` utiilsés pour le filtre comme précisé dans la consigne. Le deuxième est le process `fir_process` utilisé pour l'application combinatoire du filtre fir. Dans notre cas combinatoire, nous avons techniquement directement un output dès notre input. Ainsi, nos signaux de contrôle sont "prêts" directement.
 
 Comme nous avons une gestion de la virgule à effectuer avec `COMMAPOS`, j'ai modifié en conséquence le résultat calculé avant de l'assigner à `dout_o`.
 
-## 3.4 Avantages et inconvénients
+## 3.3 Avantages vs désavantages
 
-### Avantages
-
-* Faible latence
-* Débit élevé
-
-### Inconvénients
-
-* Forte consommation de ressources
-* Chemin critique important
 
 
 # 4. Architecture séquentielle
 
-## 4.1 Principe
-
-Décrire :
-
-* utilisation d’un unique multiplicateur,
-* accumulation séquentielle,
-* machine d’état éventuelle,
-* nombre de cycles nécessaires.
-
-## 4.2 Schéma de l’architecture
+## 4.1 Schéma de l’architecture
 
 ![Schéma séquentiel](images/sequentiel.png)
 
+## 4.2 Choix d’implémentation
 
-## 4.3 Choix d’implémentation
+Puisqu'on a qu'un seul multiplicateur de disponible, on va devoir effectuer le calcul en plusieurs cycles d'horloge. J'ai mis en place une machine d'état à 3 états : `SLEEP` (prêt à recevoir un nouvel input), `COMPUTE` (en train de calculer l'output du filtre), et `DONE` (le résultat est prêt à être lu)
 
-Décrire :
+Les signaux de sorties `din_ready_o`et `dout_valid_o` sont respectivement valide lorsque nous sommes dans l'état `SLEEP` et `DONE`.
 
-* FSM utilisée,
-* registres internes,
-* compteur de taps,
-* gestion des signaux valid/ready.
-
-
-## 4.4 Avantages et inconvénients
-
-### Avantages
-
-* Très faible consommation de ressources
-* Peu de DSP utilisés
-
-### Inconvénients
-
-* Latence importante
-* Débit plus faible
-
+## 4.3 Avantages vs désavantages
 
 # 5. Architecture pipelinée
 
-## 5.1 Principe
-
-Décrire :
-
-* découpage en étages pipeline,
-* insertion de registres,
-* amélioration de la fréquence maximale.
-
-
-## 5.2 Schéma de l’architecture
+## 5.1 Schéma de l’architecture
 
 ![Schéma pipeliné](images/pipeline.png)
 
----
-
-## 5.3 Choix d’implémentation
+## 5.2 Choix d’implémentation
 
 Décrire :
 
@@ -168,19 +123,7 @@ Décrire :
 * équilibre des calculs,
 * gestion de la validité des données.
 
-
-## 5.4 Avantages et inconvénients
-
-### Avantages
-
-* Fréquence maximale élevée
-* Bon débit
-
-### Inconvénients
-
-* Plus de registres
-* Latence augmentée
-
+## 5.3 Avantages vs désavantages
 
 # 6. Vérification et simulations
 
