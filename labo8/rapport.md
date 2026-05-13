@@ -1,216 +1,78 @@
 # SCF, Laboratoire n°8 : Filtre FIR
 
+**Étudiante : Emily Baquerizo**
+
 # 1. Introduction
 
-> Note : J'ai un problème avec le VPN de l'école qui ne veut pas se connecter, je n'ai donc pas accès au licence...
+N'ayant pas été précisé dans la consigne de manière explicite, je suis partie du principe que le reset était asynchrone.
 
-## 1.1 Objectif du laboratoire
-
-Le but de ce laboratoire est de concevoir et implémenter un filtre FIR (Finite Impulse Response) selon trois architectures différentes :
-
-- Architecture combinatoire
-- Architecture séquentielle
-- Architecture pipelinée
-
-Le laboratoire permet d’étudier les compromis entre :
-- ressources matérielles utilisées,
-- fréquence maximale atteignable,
-- latence,
-- débit de traitement.
+# 1. Architecture combinatoire
 
 
-## 1.2 Rappel théorique
-
-Un filtre FIR d’ordre `N` calcule sa sortie selon l’équation :
-
-:contentReference[oaicite:0]{index=0}
-
-avec :
-- `x[n]` : signal d’entrée,
-- `y[n]` : signal de sortie,
-- `b_i` : coefficients du filtre.
-
-Le filtre utilise un registre à décalage permettant de conserver les `N+1` dernières valeurs d’entrée.
-
-
-# 2. Cahier des charges
-
-## 2.1 Paramètres génériques
-
-| Paramètre | Description |
-|---|---|
-| `ORDER` | Ordre du filtre |
-| `DATASIZE` | Taille des données |
-| `COEFFSIZE` | Taille des coefficients |
-| `COMMAPOS` | Position de la virgule fixe |
-
-
-## 2.2 Interface du module
-
-```vhdl
-entity fir_filter is
-generic (
-    ORDER : positive := 8;
-    DATASIZE : positive := 16;
-    COEFFSIZE : positive := 16;
-    COMMAPOS : natural := 0
-);
-port (
-    clk_i : in std_logic;
-    rst_i : in std_logic;
-    din_valid_i : in std_logic;
-    din_i : in std_logic_vector(DATASIZE-1 downto 0);
-    din_ready_o : out std_logic;
-    coeffs_i : in coeff_array(0 to ORDER);
-    dout_valid_o : out std_logic;
-    dout_o : out std_logic_vector(DATASIZE-1 downto 0);
-    dout_ready_i : in std_logic
-);
-end entity fir_filter;
-```
-
-# 3. Architecture combinatoire
-
-
-## 3.1 Schéma de l’architecture
+## 1.1 Schéma de l’architecture
 
 ![Schéma combinatoire](images/combinatoire.png)
 
-## 3.2 Choix d’implémentation
-
-Décrire :
-
-* structure de l’arbre d’addition,
-* types numériques utilisés,
-* gestion du handshake,
-* gestion du débordement/troncature.
+## 1.2 Choix d’implémentation
 
 J'ai mis en place un type `data_array_t` afin de pouvoir mettre en place un registre de décalage par la suite. 
 
 J'ai 2 process dans mon architecture. Le premier `shift_process` s'occupe d'effectuer le décalage de mon registre pour les `x` utiilsés pour le filtre comme précisé dans la consigne. Le deuxième est le process `fir_process` utilisé pour l'application combinatoire du filtre fir. Dans notre cas combinatoire, nous avons techniquement directement un output dès notre input. Ainsi, nos signaux de contrôle sont "prêts" directement.
 
-Comme nous avons une gestion de la virgule à effectuer avec `COMMAPOS`, j'ai modifié en conséquence le résultat calculé avant de l'assigner à `dout_o`.
+Comme nous avons une gestion de la virgule à effectuer avec `COMMAPOS`, j'ai modifié en conséquence le résultat calculé avant de l'assigner à `dout_o`. Cette gestion a également été mise dans les 2 autres architectures.
 
-## 3.3 Avantages vs désavantages
+## 1.3 Avantages vs désavantages
 
 
 
-# 4. Architecture séquentielle
+# 2. Architecture séquentielle
 
-## 4.1 Schéma de l’architecture
+## 2.1 Schéma de l’architecture
 
 ![Schéma séquentiel](images/sequentiel.png)
 
-## 4.2 Choix d’implémentation
+## 2.2 Choix d’implémentation
 
 Puisqu'on a qu'un seul multiplicateur de disponible, on va devoir effectuer le calcul en plusieurs cycles d'horloge. J'ai mis en place une machine d'état à 3 états : `SLEEP` (prêt à recevoir un nouvel input), `COMPUTE` (en train de calculer l'output du filtre), et `DONE` (le résultat est prêt à être lu)
 
 Les signaux de sorties `din_ready_o`et `dout_valid_o` sont respectivement valide lorsque nous sommes dans l'état `SLEEP` et `DONE`.
 
-## 4.3 Avantages vs désavantages
+## 2.3 Schéma machine d'état
 
-# 5. Architecture pipelinée
+## 2.4 Avantages vs désavantages
 
-## 5.1 Schéma de l’architecture
+# 3. Architecture pipelinée
+
+## 3.1 Schéma de l’architecture
 
 ![Schéma pipeliné](images/pipeline.png)
 
-## 5.2 Choix d’implémentation
+## 3.2 Choix d’implémentation
 
-Décrire :
+Pour cette partie, j'ai mis en place 3 étages de pipeline : 
+* 1. Acquisition des inputs et registre de décalage
+* 2. Multiplication
+* 3. Acumulation et mise en place du resultat final
 
-* nombre d’étages pipeline,
-* équilibre des calculs,
-* gestion de la validité des données.
+Il a fallu prendre en compte que lorsque `dout_ready_i` n'est pas activé, on doit pouvoir mémoriser l'output jusqu'à que l'on le lise. Cela signifie que l'on va mettre en pause l'entierté du pipeline, et pour cela on va utiliser `pipeline_en`.
 
-## 5.3 Avantages vs désavantages
+De plus, pour mémoriser la validitié de l'input (`din_valid_i`) à travers notre pipeline, j'ai utilisé un `std_logic_vector(2 downto 0)` nommé `pipeline_valid_s` (stage 1 étant le bit de point faible, stage 2 le bit 1, et stage 3 le bit de point fort).
 
-# 6. Vérification et simulations
+Afin de faciliter la lecture (surtout pour moi), j'ai séparé les 3 étages en 3 process. Pour éviter les conflits entre process, j'ai reset les signaux dans leur stage correspondant (par exemple mult_s est reset uniquement dans le stage 2 car c'est dans ce stage qu'il est utilisé)
 
-## 6.1 Banc de test
+Autre que ça, les procédés de calculs et obtention du resultat est semblable aux 2 autres architectures.
 
-Décrire :
+## 3.3 Avantages vs désavantages
 
-* fonctionnement du testbench,
-* stimuli utilisés,
-* vérification des résultats.
-
-## 6.2 Résultats de simulation
-
-### Architecture combinatoire
-
-> Insérer captures d’écran et commentaires.
-
-![Simulation combinatoire](images/sim_comb.png)
+# 4. Résultats de synthèse
 
 
-### Architecture séquentielle
 
-![Simulation séquentielle](images/sim_seq.png)
+# 5. Difficultés rencontrées
+J'ai un problème avec le VPN de l'école qui ne veut pas se connecter, je n'ai donc pas accès aux licences...
 
+Autre que ça, il n'y a pas vraiment eu de difficulté autre que se rappeler comment fonctionnait le fitre FIR.
 
-### Architecture pipelinée
+# 6. Utilisation de l’intelligence artificielle
 
-![Simulation pipeline](images/sim_pipe.png)
-
-
-# 7. Résultats de synthèse
-
-## 7.1 Cible utilisée
-
-* Carte : DE1-SoC
-* FPGA : (à compléter)
-* Outil : Quartus Prime (version)
-
-
-## 7.2 Tableau récapitulatif
-
-| Architecture | ALUTs / Logic | Registres | DSP | Fmax | Latence |
-| ------------ | ------------- | --------- | --- | ---- | ------- |
-| Combinatoire |               |           |     |      |         |
-| Séquentielle |               |           |     |      |         |
-| Pipelinée    |               |           |     |      |         |
-
-
-## 7.3 Analyse des résultats
-
-Décrire :
-
-* impact du pipeline sur Fmax,
-* coût matériel,
-* compromis ressources/performance,
-* intérêt de chaque architecture selon le contexte.
-
-
-# 8. Difficultés rencontrées
-
-Décrire :
-
-* problèmes de timing,
-* gestion des tailles de mots,
-* synchronisation,
-* bugs rencontrés,
-* solutions apportées.
-
-
-# 9. Utilisation de l’intelligence artificielle
-
-Décrire précisément :
-
-* aide à la compréhension,
-* génération de code,
-* aide au debug,
-* rédaction du rapport,
-* explications théoriques.
-
-
-L'IA a été utilisé afin de réaliser le template vide du rapport selon les demandes et chapitres de la consigne. J'ai ensuite modifié le résultat afin de retirer les chapitres inutiles (par exemple un chapitre `Signaux Entrée/Sortie`) afin de minimser le rapport et éviter d'écrire un roman.
-
-# 10. Conclusion
-
-Résumer :
-
-* les résultats obtenus,
-* les différences entre architectures,
-* les enseignements tirés du laboratoire.
-
+L'IA a été utilisé afin de réaliser le template vide du rapport selon les demandes et chapitres de la consigne afin d'avoir la mise en page faite en markdown. J'ai ensuite modifié le résultat afin de retirer les chapitres inutiles (par exemple un chapitre `Signaux Entrée/Sortie`) afin de minimser le rapport et éviter d'avoir un roman.
