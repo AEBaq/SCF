@@ -1,0 +1,161 @@
+{
+	"partitions" : [
+		{
+			"name" : "Top",
+			"pins" : [
+				{
+					"name" : "din_ready_o",
+					"strict" : false
+				},
+				{
+					"name" : "dout_valid_o",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[0]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[1]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[2]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[3]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[4]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[5]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[6]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[7]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[8]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[9]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[10]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[11]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[12]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[13]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[14]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_o[15]",
+					"strict" : false
+				},
+				{
+					"name" : "dout_ready_i",
+					"strict" : false
+				},
+				{
+					"name" : "clk_i",
+					"strict" : false
+				},
+				{
+					"name" : "rst_i",
+					"strict" : false
+				},
+				{
+					"name" : "din_valid_i",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[0]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[1]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[2]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[3]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[4]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[5]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[6]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[7]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[8]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[9]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[10]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[11]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[12]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[13]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[14]",
+					"strict" : false
+				},
+				{
+					"name" : "din_i[15]",
+					"strict" : false
+				}
+			]
+		}
+	]
+}

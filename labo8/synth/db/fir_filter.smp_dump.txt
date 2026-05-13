@@ -1,0 +1,12 @@
+
+State Machine - |fir_filter_synth|fir_filter:u_fir_filter|state_s
+Name state_s.DONE state_s.COMPUTE state_s.SLEEP 
+state_s.SLEEP 0 0 0 
+state_s.COMPUTE 0 1 1 
+state_s.DONE 1 0 1 
+
+State Machine - |fir_filter_synth|fir_filter:u_fir_filter|\fir_process:next_state_s
+Name \fir_process:next_state_s.DONE \fir_process:next_state_s.COMPUTE \fir_process:next_state_s.SLEEP 
+\fir_process:next_state_s.SLEEP 0 0 0 
+\fir_process:next_state_s.COMPUTE 0 1 1 
+\fir_process:next_state_s.DONE 1 0 1 
