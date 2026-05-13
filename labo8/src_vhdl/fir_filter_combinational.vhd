@@ -32,7 +32,6 @@ entity fir_filter is
 end entity fir_filter;
 
 architecture combinational of fir_filter is 
---- Internal signals and types can be declared here if needed
 
   type data_array_t is array (0 to ORDER) of signed(DATASIZE - 1 downto 0); -- Type for shit register
   signal shift_reg_s : data_array_t;
