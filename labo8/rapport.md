@@ -89,24 +89,25 @@ Autre que ça, les procédés de calculs et obtention du resultat est semblable 
 * **Gourmand en bascules (Registers) :** Couper les chemins de données demande l'instanciation de nombreux registres de sauvegarde (`mult_s`, `pipeline_valid_s`, etc.).
 * **Latence de traitement :** Le temps absolu de traversée d'une donnée précise prend 3 cycles, ce qui peut poser problème dans un système réactif en boucle fermée strict.
 
-
-
 # 4. Résultats de synthèse
 
-| Architecture  | ALMs (Logique) | Bascules (Registers) | Multipliers (DSP 18-bit) | Fréquence Max estimée ($F_{max}$) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Combinatoire** | Élevé (~150-250) | Très faible (~144) | 9 | Très basse (~ 40 - 60 MHz) |
-| **Séquentiel** | Très faible (~40-60) | Faible (~180) | 1 | Moyenne à élevée (~ 120 - 150 MHz) |
-| **Pipeliné** | Élevé (~150-250) | Élevé (~300+) | 9 | Très élevée (> 150 MHz) |
+## 4.1 Combinatoire
+* $F_max$ : 97.67 [MHz]
+* logique combinatoire : 82
+* bascule D : 8
 
+## 4.2 Sequential
+* $F_max$ : 97.94 [MHz]
+* logique combinatoire : 120
+* bacule D : 2
 
-On observe bien le compromis classique en conception numérique **Surface vs Vitesse**. L'architecture séquentielle sauve drastiquement la surface (1 seul DSP) au prix du débit global. L'architecture pipelinée est reine pour la performance globale ($F_{max}$ et Throughput) mais exige de payer un lourd tribut en termes de bascules de registre par rapport à l'implémentation combinatoire de base.
-
+## 4.3 Pipeline
+* $F_max$ : 127.73 [MHz]
+* logique combiantoire : 163
+* bascule D : 8
 
 # 5. Difficultés rencontrées
-J'ai un problème avec le VPN de l'école qui ne veut pas se connecter, je n'ai donc pas accès aux licences...
-
-Autre que ça, il n'y a pas vraiment eu de difficulté autre que se rappeler comment fonctionnait le fitre FIR.
+Autre que des questions de temps, je n'ai pas vraiment eu de difficulté autre que se rappeler comment fonctionnait le fitre FIR.
 
 # 6. Utilisation de l’intelligence artificielle
 
